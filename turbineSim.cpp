@@ -1,4 +1,5 @@
 #include <mpi.h>
+#include <omp.h>
 
 #include <iostream>
 #include "TurbineChannel3D.h"
