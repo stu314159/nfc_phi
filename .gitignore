@@ -10,3 +10,4 @@ turbineSim
 *.vtk
 *.out
 *.lbm
+*.npy
