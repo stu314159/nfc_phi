@@ -1,0 +1,12 @@
+*.lst
+*.o
+*.cub
+*.ptx
+turbineSim
+*.mat
+*.*~
+*~
+*.b_dat
+*.vtk
+*.out
+*.lbm

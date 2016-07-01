@@ -1,0 +1,25 @@
+#!/bin/bash 
+#PBS -A USNAM37752431 
+#PBS -q gpu 
+#PBS -l select=16:ncpus=10:accelerator_model=Tesla_K40s:mpiprocs=1 
+#PBS -l walltime=01:00:00 
+#PBS -l ccm=1 
+#PBS -N newChanTst 
+#PBS -j oe 
+#PBS -V 
+#PBS -S /bin/bash 
+cd $WORKDIR
+JOBID=`echo $PBS_JOBID | cut -d '.' -f 1` 
+if [ ! -d $JOBID ]; then 
+  mkdir -p $JOBID 
+fi 
+cd $JOBID 
+cp $PBS_O_WORKDIR/turbineSim . 
+cp $PBS_O_WORKDIR/snl.lbm . 
+cp $PBS_O_WORKDIR/inl.lbm . 
+cp $PBS_O_WORKDIR/onl.lbm . 
+cp $PBS_O_WORKDIR/params.lbm . 
+cp $PBS_O_WORKDIR/process_lbm_data.py . 
+cp $PBS_O_WORKDIR/process_lbm_data_mpi.py .
+cp $PBS_O_WORKDIR/vtkHelper.py . 
+aprun -B ./turbineSim 
