@@ -9,7 +9,7 @@ MPI_CC=CC
 #endif
 
 ifeq ($(PE_ENV),PGI)
-       MPI_FLAGS=-O3 -mp
+       MPI_FLAGS=-O3 -mp -Minfo=mp -fast
 endif
 
 ifeq ($(PE_ENV),CRAY)

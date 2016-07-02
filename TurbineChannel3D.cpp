@@ -225,24 +225,25 @@ void TurbineChannel3D::write_data(MPI_Comm comm, bool isEven){
     const int numSpd=15;
    
 
-   // declarations for local variables within all of the loops:
-   // each omp thread needs a private copy of all of these.
-    float f0,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14;
-    float cu,rho,ux,uy,uz,w;
-    int X_t,Y_t,Z_t,tid_t,tid;
-    float fe0,fe1,fe2,fe3,fe4,fe5,fe6,fe7,fe8,fe9,fe10,fe11,fe12,fe13,fe14;
-    float ft1,ft2,ft3,ft4,ft5,ft6,ft7,ft8,ft9,ft10,ft11,ft12,ft13,ft14;
-    float s11,s12,s13,s22,s23,s33;
-    float nu;
-    float P;
-    float nu_e;
-    float omega; // shadows class data member omega -- already renamed omega_l  (God this is a dumb thing!)
+   int Z, Y, X;
 
-    for(int Z=firstSlice;Z<lastSlice;Z++){
-        for(int Y=0;Y<Ny;Y++){
-            for(int X=0;X<Nx;X++){
+#pragma omp parallel for collapse(3) 
+    for(Z=firstSlice;Z<lastSlice;Z++){
+        for(Y=0;Y<Ny;Y++){
+            for( X=0;X<Nx;X++){
                 
-                
+                // declarations for local variables within all of the loops:
+                // each omp thread needs a private copy of all of these.
+                float f0,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14;
+                float cu,rho,ux,uy,uz,w;
+                int X_t,Y_t,Z_t,tid_t,tid;
+                float fe0,fe1,fe2,fe3,fe4,fe5,fe6,fe7,fe8,fe9,fe10,fe11,fe12,fe13,fe14;
+                float ft1,ft2,ft3,ft4,ft5,ft6,ft7,ft8,ft9,ft10,ft11,ft12,ft13,ft14;
+                float s11,s12,s13,s22,s23,s33;
+                float nu;
+                float P;
+                float nu_e;
+                float omega; // shadows class data member omega -- already renamed omega_l  (God this is a dumb thing!)
                 tid=X+Y*Nx+Z*Nx*Ny;
                 
                 //load the data into registers
@@ -642,13 +643,14 @@ void TurbineChannel3D::write_data(MPI_Comm comm, bool isEven){
       fIn_b = fEven;
     }
     
-    
+    int tid_l, stream_spd, tid_g;
+#pragma omp parallel for collapse(3) private(tid_l,stream_spd) default(shared)    
     for(int z=0;z<HALO;z++){
         for(int y=0;y<Ny;y++){
             for(int x=0;x<Nx;x++){
                 for(int spd=0;spd<numStreamSpeeds;spd++){
-                    int tid_l = x+y*Nx+z*Nx*Ny; int tid_g = x+y*Nx+(z+z_start)*Nx*Ny;
-                    int stream_spd=streamSpeeds[spd];
+                    tid_l = x+y*Nx+z*Nx*Ny; tid_g = x+y*Nx+(z+z_start)*Nx*Ny;
+                    stream_spd=streamSpeeds[spd];
                     buff_out[tid_l*numStreamSpeeds+spd]=fIn_b[getIdx(nnodes, numSpd, tid_g,stream_spd)];
                 }
             }
@@ -672,13 +674,14 @@ void TurbineChannel3D::write_data(MPI_Comm comm, bool isEven){
       fOut_b = fEven;
     }
     
-   
+   int tid_l, tid_g, stream_spd;
+#pragma omp parallel for collapse(3) private(tid_l,stream_spd) default(shared)
     for(int z=0;z<HALO;z++){
         for(int y=0;y<Ny;y++){
             for(int x=0;x<Nx;x++){
                 for(int spd=0;spd<numStreamSpeeds;spd++){
-                    int tid_l=x+y*Nx+z*Nx*Ny; int tid_g = x+y*Nx+(z+z_start)*Nx*Ny;
-                    int stream_spd=streamSpeeds[spd];
+                    tid_l=x+y*Nx+z*Nx*Ny; tid_g = x+y*Nx+(z+z_start)*Nx*Ny;
+                    stream_spd=streamSpeeds[spd];
                     fOut_b[getIdx(nnodes, numSpd, tid_g,stream_spd)]=buff_in[tid_l*numStreamSpeeds+spd];
                 }
             }
