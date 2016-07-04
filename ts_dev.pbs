@@ -1,12 +1,12 @@
 #!/bin/bash
 #PBS -A USNAM37752431
-#PBS -q standard
-#PBS -l select=4:ncpus=12:mpiprocs=1
+#PBS -q phi
+#PBS -l select=4:ncpus=10:mpiprocs=1
 #PBS -l walltime=00:30:00
 #PBS -l ccm=1
 #PBS -N nfc_phi_dev
 #PBS -j oe
-#PBS -V
+##PBS -V
 #PBS -S /bin/bash
 cd $WORKDIR
 JOBID=`echo $PBS_JOBID | cut -d '.' -f 1`
@@ -24,5 +24,10 @@ cp $PBS_O_WORKDIR/process_lbm_data_mpi.py .
 cp $PBS_O_WORKDIR/vtkHelper.py .
 cp $PBS_O_WORKDIR/gold_standard.npy .
 cp $PBS_O_WORKDIR/validate_r3.py .
-export OMP_NUM_THREADS=12
-aprun -B ./turbineSim 
+export OMP_NUM_THREADS=236
+export KMP_AFFINITY="granularity=fine,compact"
+export KMP_PLACE_THREAD="59c,4t"
+
+export I_MPI_MIC=1
+
+aprun -k -B ./turbineSim 

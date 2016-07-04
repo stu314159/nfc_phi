@@ -17,7 +17,7 @@ ifeq ($(PE_ENV),CRAY)
 endif
 
 ifeq ($(PE_ENV),INTEL)
-       MPI_FLAGS=-O3  -openmp
+       MPI_FLAGS=-openmp -mmic
 endif
 
 
